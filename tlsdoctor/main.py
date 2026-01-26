@@ -6,7 +6,7 @@ from .models import Target, Finding, Status, Severity
 from .utils import normalize_url, get_host, to_https, to_http
 from .testssl_engine import run_testssl
 from .testssl_parse import parse_testssl_to_findings
-
+from .sri_check import check_sri
 
 
 def build_target(input_url: str) -> Target:
@@ -34,6 +34,7 @@ def main():
     testssl_script = project_root / "testssl.sh" / "testssl.sh"
     out_json = project_root / "tlsdoctor" / "data" / "testssl_output.json"
 
+    # 1) Transport-layer scan (testssl.sh)
     try:
         testssl_json = run_testssl(target.host, testssl_script, out_json)
         findings.extend(parse_testssl_to_findings(testssl_json))
@@ -45,10 +46,26 @@ def main():
                 severity=Severity.MEDIUM,
                 summary="testssl.sh execution failed.",
                 evidence={"error": str(e), "testssl_script": str(testssl_script)},
-                fix="Check testssl.sh path and dependencies (openssl/curl) in WSL."
+                fix="Check testssl.sh path and dependencies (openssl/curl/bc) in WSL.",
+                refs=["testssl.sh"],
             )
         )
 
+    # 2) Application/browser-side cryptographic integrity (SRI)
+    try:
+        findings.append(check_sri(target.https_url))
+    except Exception as e:
+        findings.append(
+            Finding(
+                check_id="sri_check",
+                status=Status.WARN,
+                severity=Severity.MEDIUM,
+                summary="SRI check failed unexpectedly.",
+                evidence={"error": str(e), "https_url": target.https_url},
+                fix="Verify the HTTPS URL is reachable and returns HTML content.",
+                refs=["W3C Subresource Integrity"],
+            )
+        )
 
     report = {
         "target": {
