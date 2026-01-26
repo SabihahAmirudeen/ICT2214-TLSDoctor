@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# testssl output
+tlsdoctor/data/
+testssl_output.json
+
+# OS/editor
+.vscode/
+.DS_Store
