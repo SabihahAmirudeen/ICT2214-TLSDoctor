@@ -7,6 +7,7 @@ from .utils import normalize_url, get_host, to_https, to_http
 from .testssl_engine import run_testssl
 from .testssl_parse import parse_testssl_to_findings
 from .sri_check import check_sri
+from .redirect_hsts import analyze_domain
 
 
 def build_target(input_url: str) -> Target:
@@ -38,6 +39,10 @@ def main():
     try:
         testssl_json = run_testssl(target.host, testssl_script, out_json)
         findings.extend(parse_testssl_to_findings(testssl_json))
+
+        redirect_hsts = analyze_domain(out_json)
+        findings.extend(redirect_hsts)
+
     except Exception as e:
         findings.append(
             Finding(

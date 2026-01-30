@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 
 class Status(str, Enum):
+    INFO = "INFO"
     PASS = "PASS"
     WARN = "WARN"
     FAIL = "FAIL"
