@@ -166,7 +166,7 @@ def evaluate_transport_policy(redirect, hsts):
                         "issues": preload_issues
                     },
                     fix=(
-                        "Ensure max-age ≥ 31536000 and includeSubDomains are set "
+                        "Ensure max-age is of at least 31536000 seconds and includeSubDomains are set "
                         "before using the preload directive. "
                         "Misconfigured preload can permanently break site access."
                     ),
@@ -190,7 +190,6 @@ def evaluate_transport_policy(redirect, hsts):
             )
 
     return findings
-
 
 def analyze_domain(json_path):
     results = load_testssl_results(json_path)
