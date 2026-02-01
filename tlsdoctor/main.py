@@ -8,6 +8,7 @@ from .testssl_engine import run_testssl
 from .testssl_parse import parse_testssl_to_findings
 from .sri_check import check_sri
 from .redirect_hsts import analyze_domain
+from .reporting import generate_report
 
 
 def build_target(input_url: str) -> Target:
@@ -25,6 +26,7 @@ def main():
     parser = argparse.ArgumentParser(description="TLSDoctor (baseline)")
     parser.add_argument("url", help="Target URL or hostname")
     parser.add_argument("--json", action="store_true", help="Output JSON only")
+    parser.add_argument("--report", action="store_true", help="Write JSON report to tlsdoctor/data/report.json")
     args = parser.parse_args()
 
     target = build_target(args.url)
@@ -72,31 +74,28 @@ def main():
             )
         )
 
-    report = {
-        "target": {
-            "input": target.input_url,
-            "host": target.host,
-            "https_url": target.https_url,
-            "http_url": target.http_url,
-        },
-        "findings": [
-            {
-                "check_id": f.check_id,
-                "status": f.status.value,
-                "severity": f.severity.value,
-                "summary": f.summary,
-                "evidence": f.evidence,
-                "fix": f.fix,
-                "refs": f.refs,
-            }
-            for f in findings
-        ],
+    target_obj = {
+        "input": target.input_url,
+        "host": target.host,
+        "https_url": target.https_url,
+        "http_url": target.http_url,
     }
+
+    report = generate_report(target_obj, findings)
+
+    # Optionally write report JSON to disk
+    project_root = Path(__file__).resolve().parents[1]
+    report_file = project_root / "tlsdoctor" / "data" / "report.json"
+    if args.report:
+        with open(report_file, "w") as fh:
+            json.dump(report, fh, indent=2)
 
     if args.json:
         print(json.dumps(report, indent=2))
     else:
         print(f"TLSDoctor scan for {target.host}\n")
+        rs = report.get("risk_summary", {})
+        print(f"Overall risk: {rs.get('risk_level')} ({rs.get('score')}%)\n")
         for f in findings:
             print(f"[{f.status.value}] {f.check_id} ({f.severity.value})")
             print(f"  {f.summary}")
