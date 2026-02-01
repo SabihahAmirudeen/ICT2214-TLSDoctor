@@ -1263,21 +1263,21 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "+9479 seconds from localtime"
+              "finding"      : "+11566 seconds from localtime"
           }
 ,         {
               "id"           : "HTTP_headerTime",
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "1769959147"
+              "finding"      : "1769961234"
           }
 ,         {
               "id"           : "HTTP_headerAge",
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "9478 seconds"
+              "finding"      : "11566 seconds"
           }
 ,         {
               "id"           : "HSTS",
@@ -2389,7 +2389,7 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "off by +1 seconds from your localtime"
+              "finding"      : "off by 0 seconds from your localtime"
           }
 ,         {
               "id"           : "certificate_compression",
@@ -3110,21 +3110,21 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "+9603 seconds from localtime"
+              "finding"      : "+11702 seconds from localtime"
           }
 ,         {
               "id"           : "HTTP_headerTime",
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "1769959271"
+              "finding"      : "1769961369"
           }
 ,         {
               "id"           : "HTTP_headerAge",
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "9602 seconds"
+              "finding"      : "11701 seconds"
           }
 ,         {
               "id"           : "HSTS",
@@ -3705,6 +3705,6 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "241"
+              "finding"      : "269"
           }
 ]

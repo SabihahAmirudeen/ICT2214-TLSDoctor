@@ -8,7 +8,7 @@ from .testssl_engine import run_testssl
 from .testssl_parse import parse_testssl_to_findings
 from .sri_check import check_sri
 from .redirect_hsts import analyze_domain
-from .reporting import generate_report
+from .reporting import generate_report, write_csv
 
 
 def build_target(input_url: str) -> Target:
@@ -27,6 +27,7 @@ def main():
     parser.add_argument("url", help="Target URL or hostname")
     parser.add_argument("--json", action="store_true", help="Output JSON only")
     parser.add_argument("--report", action="store_true", help="Write JSON report to tlsdoctor/data/report.json")
+    parser.add_argument("--csv", help="Write CSV report to path (e.g. tlsdoctor/data/report.csv)")
     args = parser.parse_args()
 
     target = build_target(args.url)
@@ -89,6 +90,12 @@ def main():
     if args.report:
         with open(report_file, "w") as fh:
             json.dump(report, fh, indent=2)
+
+    if args.csv:
+        try:
+            write_csv(report, args.csv)
+        except Exception as e:
+            print(f"Failed to write CSV to {args.csv}: {e}")
 
     if args.json:
         print(json.dumps(report, indent=2))
