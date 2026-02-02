@@ -3,7 +3,8 @@ import json
 from pathlib import Path
 
 from .models import Target, Finding, Status, Severity
-from .utils import normalize_url, get_host, to_https, to_http
+
+from .utils import normalize_url, get_host, to_https, to_http, ProgressSpinner
 from .testssl_engine import run_testssl
 from .testssl_parse import parse_testssl_to_findings
 from .checks.mixed_content import scan_mixed_content
@@ -11,6 +12,7 @@ from .http_client import get_text
 from .sri_check import check_sri
 from .redirect_hsts import analyze_domain
 from .reporting import generate_report, write_csv
+from .auth_transport_check import check_auth_over_http
 
 
 def build_target(input_url: str) -> Target:
@@ -63,10 +65,14 @@ def main():
 
     # 1) Transport-layer scan (testssl.sh)
     try:
-        testssl_json = run_testssl(target.host, testssl_script, out_json)
+        with ProgressSpinner(f"Running testssl.sh on {target.host}", cap=95, step_delay=0.8) as ps:
+            testssl_json = run_testssl(target.host, testssl_script, out_json)
+            ps.update(60)
         findings.extend(parse_testssl_to_findings(testssl_json))
 
-        redirect_hsts = analyze_domain(out_json)
+        with ProgressSpinner("Analyzing redirect/HSTS", cap=80, step_delay=0.4) as ps:
+            redirect_hsts = analyze_domain(out_json)
+            ps.update(90)
         findings.extend(redirect_hsts)
 
     except Exception as e:
@@ -82,14 +88,18 @@ def main():
             )
         )
 
-        # Phase 5: Browser Integrity (Static) - Mixed Content
+    # Browser Integrity (Static) - Mixed Content
     try:
-        html = get_text(target.https_url)
-        hits = scan_mixed_content(
-            base_url=target.https_url,
-            html=html,
-            http_get_text=get_text,  # enables external CSS scanning
-        )
+        with ProgressSpinner(f"Fetching {target.https_url}", cap=60, step_delay=0.3) as ps:
+            html = get_text(target.https_url)
+            ps.update(60)
+        with ProgressSpinner("Scanning for mixed content", cap=95, step_delay=0.2) as ps:
+            hits = scan_mixed_content(
+                base_url=target.https_url,
+                html=html,
+                http_get_text=get_text,  # enables external CSS scanning
+            )
+            ps.update(95)
         for h in hits:
             findings.append(mixed_hit_to_finding(h))
 
@@ -118,8 +128,23 @@ def main():
                 refs=["OWASP A04:2025"]
             )
         )
+    #Authentication material exposure over HTTP (A02 + A04)
+    try:
+        findings.append(check_auth_over_http(target.http_url))
+    except Exception as e:
+        findings.append(
+            Finding(
+                check_id="auth_over_http",
+                status=Status.WARN,
+                severity=Severity.MEDIUM,
+                summary="Authentication-over-HTTP check failed unexpectedly.",
+                evidence={"error": str(e), "http_url": target.http_url},
+                fix="Verify the host is reachable over HTTP (port 80) and try again.",
+                refs=["OWASP A02:2025", "OWASP A04:2025"],
+            )
+        )
 
-    # 2) Application/browser-side cryptographic integrity (SRI)
+    #Application/browser-side cryptographic integrity (SRI)
     try:
         findings.append(check_sri(target.https_url))
     except Exception as e:

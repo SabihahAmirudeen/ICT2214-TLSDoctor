@@ -542,7 +542,7 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "off by 0 seconds from your localtime"
+              "finding"      : "off by -1 seconds from your localtime"
           }
 ,         {
               "id"           : "certificate_compression",
@@ -675,7 +675,7 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "MEDIUM",
-              "finding"      : "expires < 60 days (43)"
+              "finding"      : "expires < 60 days (42)"
           }
 ,         {
               "id"           : "cert_notBefore <hostCert#1>",
@@ -1018,7 +1018,7 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "MEDIUM",
-              "finding"      : "expires < 60 days (43)"
+              "finding"      : "expires < 60 days (42)"
           }
 ,         {
               "id"           : "cert_notBefore <hostCert#2>",
@@ -1263,21 +1263,21 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "+11566 seconds from localtime"
+              "finding"      : "+10047 seconds from localtime"
           }
 ,         {
               "id"           : "HTTP_headerTime",
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "1769961234"
+              "finding"      : "1770046121"
           }
 ,         {
               "id"           : "HTTP_headerAge",
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "11566 seconds"
+              "finding"      : "10047 seconds"
           }
 ,         {
               "id"           : "HSTS",
@@ -2389,7 +2389,7 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "off by 0 seconds from your localtime"
+              "finding"      : "off by -1 seconds from your localtime"
           }
 ,         {
               "id"           : "certificate_compression",
@@ -2522,7 +2522,7 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "MEDIUM",
-              "finding"      : "expires < 60 days (43)"
+              "finding"      : "expires < 60 days (42)"
           }
 ,         {
               "id"           : "cert_notBefore <hostCert#1>",
@@ -2865,7 +2865,7 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "MEDIUM",
-              "finding"      : "expires < 60 days (43)"
+              "finding"      : "expires < 60 days (42)"
           }
 ,         {
               "id"           : "cert_notBefore <hostCert#2>",
@@ -3110,21 +3110,21 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "+11702 seconds from localtime"
+              "finding"      : "+10177 seconds from localtime"
           }
 ,         {
               "id"           : "HTTP_headerTime",
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "1769961369"
+              "finding"      : "1770046252"
           }
 ,         {
               "id"           : "HTTP_headerAge",
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "11701 seconds"
+              "finding"      : "10178 seconds"
           }
 ,         {
               "id"           : "HSTS",
@@ -3705,6 +3705,6 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "269"
+              "finding"      : "261"
           }
 ]
