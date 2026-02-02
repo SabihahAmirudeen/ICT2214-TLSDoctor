@@ -542,7 +542,7 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "off by +1 seconds from your localtime"
+              "finding"      : "off by 0 seconds from your localtime"
           }
 ,         {
               "id"           : "certificate_compression",
@@ -657,6 +657,13 @@
               "finding"      : "Ok via SAN and CN (SNI mandatory)"
           }
 ,         {
+              "id"           : "cert_chain_of_trust <hostCert#1>",
+              "ip"           : "example.com/104.18.27.120",
+              "port"         : "443",
+              "severity"     : "OK",
+              "finding"      : "passed."
+          }
+,         {
               "id"           : "cert_certificatePolicies_EV <hostCert#1>",
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
@@ -668,7 +675,7 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "MEDIUM",
-              "finding"      : "expires < 60 days (53)"
+              "finding"      : "expires < 60 days (43)"
           }
 ,         {
               "id"           : "cert_notBefore <hostCert#1>",
@@ -718,6 +725,13 @@
               "port"         : "443",
               "severity"     : "OK",
               "finding"      : "offered"
+          }
+,         {
+              "id"           : "cert_ocspRevoked <hostCert#1>",
+              "ip"           : "example.com/104.18.27.120",
+              "port"         : "443",
+              "severity"     : "OK",
+              "finding"      : "not revoked"
           }
 ,         {
               "id"           : "cert_mustStapleExtension <hostCert#1>",
@@ -986,6 +1000,13 @@
               "finding"      : "Ok via SAN and CN (SNI mandatory)"
           }
 ,         {
+              "id"           : "cert_chain_of_trust <hostCert#2>",
+              "ip"           : "example.com/104.18.27.120",
+              "port"         : "443",
+              "severity"     : "OK",
+              "finding"      : "passed."
+          }
+,         {
               "id"           : "cert_certificatePolicies_EV <hostCert#2>",
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
@@ -997,7 +1018,7 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "MEDIUM",
-              "finding"      : "expires < 60 days (53)"
+              "finding"      : "expires < 60 days (43)"
           }
 ,         {
               "id"           : "cert_notBefore <hostCert#2>",
@@ -1047,6 +1068,13 @@
               "port"         : "443",
               "severity"     : "OK",
               "finding"      : "offered"
+          }
+,         {
+              "id"           : "cert_ocspRevoked <hostCert#2>",
+              "ip"           : "example.com/104.18.27.120",
+              "port"         : "443",
+              "severity"     : "OK",
+              "finding"      : "not revoked"
           }
 ,         {
               "id"           : "cert_mustStapleExtension <hostCert#2>",
@@ -1235,21 +1263,21 @@
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "+5469 seconds from localtime"
+              "finding"      : "+11566 seconds from localtime"
           }
 ,         {
               "id"           : "HTTP_headerTime",
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "1769076681"
+              "finding"      : "1769961234"
           }
 ,         {
               "id"           : "HTTP_headerAge",
               "ip"           : "example.com/104.18.27.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "5468 seconds"
+              "finding"      : "11566 seconds"
           }
 ,         {
               "id"           : "HSTS",
@@ -2476,6 +2504,13 @@
               "finding"      : "Ok via SAN and CN (SNI mandatory)"
           }
 ,         {
+              "id"           : "cert_chain_of_trust <hostCert#1>",
+              "ip"           : "example.com/104.18.26.120",
+              "port"         : "443",
+              "severity"     : "OK",
+              "finding"      : "passed."
+          }
+,         {
               "id"           : "cert_certificatePolicies_EV <hostCert#1>",
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
@@ -2487,7 +2522,7 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "MEDIUM",
-              "finding"      : "expires < 60 days (53)"
+              "finding"      : "expires < 60 days (43)"
           }
 ,         {
               "id"           : "cert_notBefore <hostCert#1>",
@@ -2537,6 +2572,13 @@
               "port"         : "443",
               "severity"     : "OK",
               "finding"      : "offered"
+          }
+,         {
+              "id"           : "cert_ocspRevoked <hostCert#1>",
+              "ip"           : "example.com/104.18.26.120",
+              "port"         : "443",
+              "severity"     : "OK",
+              "finding"      : "not revoked"
           }
 ,         {
               "id"           : "cert_mustStapleExtension <hostCert#1>",
@@ -2805,6 +2847,13 @@
               "finding"      : "Ok via SAN and CN (SNI mandatory)"
           }
 ,         {
+              "id"           : "cert_chain_of_trust <hostCert#2>",
+              "ip"           : "example.com/104.18.26.120",
+              "port"         : "443",
+              "severity"     : "OK",
+              "finding"      : "passed."
+          }
+,         {
               "id"           : "cert_certificatePolicies_EV <hostCert#2>",
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
@@ -2816,7 +2865,7 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "MEDIUM",
-              "finding"      : "expires < 60 days (53)"
+              "finding"      : "expires < 60 days (43)"
           }
 ,         {
               "id"           : "cert_notBefore <hostCert#2>",
@@ -2866,6 +2915,13 @@
               "port"         : "443",
               "severity"     : "OK",
               "finding"      : "offered"
+          }
+,         {
+              "id"           : "cert_ocspRevoked <hostCert#2>",
+              "ip"           : "example.com/104.18.26.120",
+              "port"         : "443",
+              "severity"     : "OK",
+              "finding"      : "not revoked"
           }
 ,         {
               "id"           : "cert_mustStapleExtension <hostCert#2>",
@@ -3054,21 +3110,21 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "+5619 seconds from localtime"
+              "finding"      : "+11702 seconds from localtime"
           }
 ,         {
               "id"           : "HTTP_headerTime",
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "1769076831"
+              "finding"      : "1769961369"
           }
 ,         {
               "id"           : "HTTP_headerAge",
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "5618 seconds"
+              "finding"      : "11701 seconds"
           }
 ,         {
               "id"           : "HSTS",
@@ -3649,6 +3705,6 @@
               "ip"           : "example.com/104.18.26.120",
               "port"         : "443",
               "severity"     : "INFO",
-              "finding"      : "305"
+              "finding"      : "269"
           }
 ]

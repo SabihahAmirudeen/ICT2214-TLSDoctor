@@ -1,9 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List
 
 
 class Status(str, Enum):
+    INFO = "INFO"
     PASS = "PASS"
     WARN = "WARN"
     FAIL = "FAIL"
@@ -32,4 +33,4 @@ class Finding:
     summary: str
     evidence: Dict[str, Any]
     fix: str
-    refs: Optional[List[str]] = None
+    refs: List[str] = field(default_factory=list)

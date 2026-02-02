@@ -17,10 +17,10 @@ def normalize_url(url: str) -> str:
 
 def get_host(url: str) -> str:
     """
-    Extract hostname from a URL.
+    Extract hostname from a URL (hostname only, without port).
     """
     parsed = urlparse(url)
-    return parsed.netloc
+    return parsed.hostname or ""
 
 
 def to_https(url: str) -> str:
