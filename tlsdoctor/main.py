@@ -13,6 +13,8 @@ from .sri_check import check_sri
 from .redirect_hsts import analyze_domain
 from .reporting import generate_report, write_csv
 from .auth_transport_check import check_auth_over_http
+from .cert_check import check_certificate
+from .tls_version import check_tls_versions
 
 
 def build_target(input_url: str) -> Target:
@@ -75,6 +77,23 @@ def main():
             ps.update(90)
         findings.extend(redirect_hsts)
 
+        # Build TLS support map for TLS version checks
+        tls_support = {
+            "TLSv1": False,
+            "TLSv1_1": False,
+            "TLSv1_2": False,
+            "TLSv1_3": False,
+        }
+
+        for entry in testssl_json:
+            proto = entry.get("id")
+            if proto in tls_support and entry.get("finding") == "offered":
+                tls_support[proto] = True
+
+        # TLS versions + certificate checks
+        findings.extend(check_tls_versions(tls_support))
+        findings.extend(check_certificate(target.host))
+        
     except Exception as e:
         findings.append(
             Finding(
