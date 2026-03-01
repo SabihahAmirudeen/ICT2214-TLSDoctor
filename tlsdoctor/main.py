@@ -15,6 +15,7 @@ from .reporting import generate_report, write_csv
 from .auth_transport_check import check_auth_over_http
 from .cert_check import check_certificate
 from .tls_version import check_tls_versions
+from .certificate_strength_check import check_certificate_strength
 
 
 def build_target(input_url: str) -> Target:
@@ -93,6 +94,7 @@ def main():
         # TLS versions + certificate checks
         findings.extend(check_tls_versions(tls_support))
         findings.extend(check_certificate(target.host))
+        findings.append(check_certificate_strength(target.host))
         
     except Exception as e:
         findings.append(
@@ -211,6 +213,8 @@ def main():
             print(f"[{f.status.value}] {f.check_id} ({f.severity.value})")
             print(f"  {f.summary}")
             print(f"  Fix: {f.fix}\n")
+    
+    
 
 
 if __name__ == "__main__":
