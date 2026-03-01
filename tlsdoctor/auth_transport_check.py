@@ -1,3 +1,9 @@
+# This check is passive and unauthenticated;
+# it detects exposure of auth-like cookies issued
+# during initial HTTP access,
+# but cannot observe cookies only set after login.
+
+
 from typing import Dict, Any, List
 import requests
 
@@ -66,8 +72,8 @@ def check_auth_over_http(http_url: str, timeout: float = 8.0) -> Finding:
         evidence["redirect_chain"] = chain
         evidence["final_url"] = resp.url
 
-        # Check for Authorization header in response (uncommon but bad practice)
-        # Note: "Authorization" is typically a request header, but some systems echo tokens back.
+        # Check for Authorisation header in response (uncommon but bad practice)
+        # Note: Authorisation is typically a request header, but some systems echo tokens back.
         if "authorization" in (k.lower() for k in resp.headers.keys()):
             evidence["authorization_header_seen"] = True
 
@@ -150,3 +156,4 @@ def check_auth_over_http(http_url: str, timeout: float = 8.0) -> Finding:
             fix="Verify the host is reachable on HTTP (port 80) and try again.",
             refs=["OWASP A02: Identification and Authentication Failures"],
         )
+
