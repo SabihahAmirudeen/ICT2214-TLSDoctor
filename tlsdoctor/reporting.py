@@ -6,22 +6,22 @@ import json
 from .models import Finding, Severity, Status
 
 
-def _severity_weight(sev: Severity) -> int:
+def _impact_score(sev: Severity) -> float:
     return {
-        Severity.LOW: 1,
-        Severity.MEDIUM: 3,
-        Severity.HIGH: 6,
-        Severity.CRITICAL: 10,
-    }.get(sev, 1)
+        Severity.LOW: 2.0,
+        Severity.MEDIUM: 5.0,
+        Severity.HIGH: 8.0,
+        Severity.CRITICAL: 10.0,
+    }.get(sev, 2.0)
 
 
-def _status_multiplier(status: Status) -> float:
+def _likelihood_score(status: Status) -> float:
     return {
         Status.PASS: 0.0,
-        Status.INFO: 0.2,
-        Status.WARN: 0.7,
-        Status.FAIL: 1.0,
-    }.get(status, 0.5)
+        Status.INFO: 2.0,
+        Status.WARN: 5.0,
+        Status.FAIL: 8.0,
+    }.get(status, 5.0)
 
 
 def rate_findings(findings: List[Finding]) -> Dict[str, Any]:
@@ -34,12 +34,12 @@ def rate_findings(findings: List[Finding]) -> Dict[str, Any]:
 
     by_finding = []
     total_score = 0.0
-    max_per_finding = 10.0  # severity weight max (10) * status mult (1)
-
+    max_per_finding = 10.0 * 8.0  # max impact (10) × max likelihood (8)
+    
     for f in findings:
-        sw = _severity_weight(f.severity)
-        sm = _status_multiplier(f.status)
-        fs = sw * sm
+        impact = _impact_score(f.severity)
+        likelihood = _likelihood_score(f.status)
+        fs = impact * likelihood
         total_score += fs
         by_finding.append(
             {
@@ -90,52 +90,74 @@ def generate_report(target: Dict[str, Any], findings: List[Finding]) -> Dict[str
 
 
 def write_csv(report: Dict[str, Any], csv_path: str) -> None:
-    """Write the report to a CSV file.
-
-    Columns: target_input, host, https_url, check_id, status, severity,
-    summary, fix, refs (semicolon-separated), evidence (JSON), finding_score
     """
-    p = Path(csv_path)
-    if not p.parent.exists():
-        p.parent.mkdir(parents=True, exist_ok=True)
+    Write a single CSV containing:
+    1) Summary section (top)
+    2) Blank row
+    3) Detailed findings section
+    """
 
-    # map check_id -> score from risk_summary
-    score_map = {}
+    p = Path(csv_path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+
+    tgt = report.get("target", {})
     rs = report.get("risk_summary", {})
-    for item in rs.get("by_finding", []):
-        score_map[item.get("check_id")] = item.get("score")
+    findings = report.get("findings", [])
+
+    # Build score lookup
+    score_map = {
+        item["check_id"]: item["score"]
+        for item in rs.get("by_finding", [])
+    }
 
     with p.open("w", newline="", encoding="utf-8") as fh:
         writer = csv.writer(fh)
+
+        # =============================
+        # SUMMARY SECTION
+        # =============================
+        writer.writerow(["=== TLSDoctor Scan Summary ==="])
+        writer.writerow(["Target Input", tgt.get("input")])
+        writer.writerow(["Host", tgt.get("host")])
+        writer.writerow(["HTTPS URL", tgt.get("https_url")])
+        writer.writerow(["Overall Risk Score", rs.get("score")])
+        writer.writerow(["Overall Risk Level", rs.get("risk_level")])
+        writer.writerow(["Total Findings", len(findings)])
+
+        statuses = [f["status"] for f in findings]
+        writer.writerow(["PASS Count", statuses.count("PASS")])
+        writer.writerow(["WARN Count", statuses.count("WARN")])
+        writer.writerow(["FAIL Count", statuses.count("FAIL")])
+
+        # Blank separator row
+        writer.writerow([])
+        writer.writerow(["=== Detailed Findings ==="])
+
+        # =============================
+        # FINDINGS TABLE HEADER
+        # =============================
         writer.writerow([
-            "target_input",
-            "host",
-            "https_url",
             "check_id",
             "status",
             "severity",
             "summary",
             "fix",
             "refs",
-            "evidence",
+            "evidence_json",
             "finding_score",
         ])
 
-        tgt = report.get("target", {})
-        for f in report.get("findings", []):
-            refs = ";".join(f.get("refs") or [])
-            evidence = json.dumps(f.get("evidence") or {})
-            score = score_map.get(f.get("check_id"))
+        # =============================
+        # FINDINGS ROWS
+        # =============================
+        for f in findings:
             writer.writerow([
-                tgt.get("input"),
-                tgt.get("host"),
-                tgt.get("https_url"),
                 f.get("check_id"),
                 f.get("status"),
                 f.get("severity"),
                 f.get("summary"),
                 f.get("fix"),
-                refs,
-                evidence,
-                score,
+                json.dumps(f.get("refs") or []),
+                json.dumps(f.get("evidence") or {}, ensure_ascii=False),
+                score_map.get(f.get("check_id")),
             ])
