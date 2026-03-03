@@ -8,6 +8,7 @@ from .utils import normalize_url, get_host, to_https, to_http, ProgressSpinner
 from .testssl_engine import run_testssl
 from .testssl_parse import parse_testssl_to_findings
 from .checks.mixed_content import scan_mixed_content
+from .checks.cookie_hygiene import check_cookie_hygiene
 from .http_client import get_text
 from .sri_check import check_sri
 from .redirect_hsts import analyze_domain
@@ -162,6 +163,22 @@ def main():
                 evidence={"error": str(e), "http_url": target.http_url},
                 fix="Verify the host is reachable over HTTP (port 80) and try again.",
                 refs=["OWASP A02:2025", "OWASP A04:2025"],
+            )
+        )
+    
+    # Cookie hygiene
+    try:
+        findings.append(check_cookie_hygiene(target.https_url))
+    except Exception as e:
+        findings.append(
+            Finding(
+                check_id="cookie_hygiene",
+                status=Status.WARN,
+                severity=Severity.MEDIUM,
+                summary="Cookie hygiene check failed unexpectedly.",
+                evidence={"error": str(e), "https_url": target.https_url},
+                fix="Verify the HTTPS URL is reachable and returns responses with Set-Cookie headers.",
+                refs=["OWASP Session Management Cheat Sheet"],
             )
         )
 

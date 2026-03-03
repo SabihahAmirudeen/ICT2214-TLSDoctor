@@ -12,3 +12,4 @@ testssl_output.json
 # OS/editor
 .vscode/
 .DS_Store
+/venv
