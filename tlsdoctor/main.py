@@ -51,7 +51,7 @@ def mixed_hit_to_finding(hit) -> Finding:
     )
 
 def main():
-    print("Update 1")
+    print("Grab a cuppa ☕ and let's get scanning! TLSDoctor is running...\n")
     parser = argparse.ArgumentParser(description="TLSDoctor (baseline)")
     parser.add_argument("url", help="Target URL or hostname")
     parser.add_argument("--json", action="store_true", help="Output JSON only")
