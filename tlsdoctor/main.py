@@ -87,10 +87,19 @@ def main():
             "TLSv1_3": False,
         }
 
+        TLS_ID_MAP = {
+            "tls1":   "TLSv1",
+            "tls1_1": "TLSv1_1",
+            "tls1_2": "TLSv1_2",
+            "tls1_3": "TLSv1_3",
+        }
+
         for entry in testssl_json:
-            proto = entry.get("id")
-            if proto in tls_support and entry.get("finding") == "offered":
-                tls_support[proto] = True
+            entry_id = str(entry.get("id", "")).lower().strip()
+            finding = str(entry.get("finding", "")).lower()
+
+            if entry_id in TLS_ID_MAP and "offered" in finding and "not offered" not in finding:
+                tls_support[TLS_ID_MAP[entry_id]] = True
 
         # TLS versions + certificate checks
         findings.extend(check_tls_versions(tls_support))
