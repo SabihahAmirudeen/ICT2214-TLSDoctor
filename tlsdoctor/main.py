@@ -17,6 +17,7 @@ from .auth_transport_check import check_auth_over_http
 from .cert_check import check_certificate
 from .tls_version import check_tls_versions
 from .certificate_strength_check import check_certificate_strength
+from .session_cookie_live import check_session_cookie_lifetime
 
 
 def build_target(input_url: str) -> Target:
@@ -171,7 +172,7 @@ def main():
                 summary="Authentication-over-HTTP check failed unexpectedly.",
                 evidence={"error": str(e), "http_url": target.http_url},
                 fix="Verify the host is reachable over HTTP (port 80) and try again.",
-                refs=["OWASP A02:2025", "OWASP A04:2025"],
+                refs=["OWASP A07:2025", "OWASP A04:2025"],
             )
         )
     
@@ -190,6 +191,23 @@ def main():
                 refs=["OWASP Session Management Cheat Sheet"],
             )
         )
+    
+    # Session Cookie Persistence Check (OWASP Session Management)
+    try:
+        findings.extend(check_session_cookie_lifetime(target.https_url))
+    except Exception as e:
+        findings.append(
+            Finding(
+                check_id="session_cookie_persistence",
+                status=Status.WARN,
+                severity=Severity.MEDIUM,
+                summary="Session cookie lifetime check failed unexpectedly.",
+                evidence={"error": str(e), "https_url": target.https_url},
+                fix="Verify the HTTPS URL is reachable and returns cookies.",
+                refs=["OWASP A07:2025"],
+            )
+        )
+
 
     #Application/browser-side cryptographic integrity (SRI)
     try:

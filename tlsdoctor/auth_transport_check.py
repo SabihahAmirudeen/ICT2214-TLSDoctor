@@ -108,7 +108,7 @@ def check_auth_over_http(http_url: str, timeout: float = 8.0) -> Finding:
                     summary="Authentication/session cookies are exposed over HTTP (unencrypted), enabling interception.",
                     evidence=evidence,
                     fix="Force HTTP→HTTPS redirect; ensure session/auth cookies include Secure; serve login/session endpoints only over HTTPS.",
-                    refs=["OWASP A02: Identification and Authentication Failures", "OWASP A04: Cryptographic Failures"],
+                    refs=["OWASP A07:2025", "OWASP A04:2025"],
                 )
 
             # Redirects to HTTPS but cookies missing Secure is still serious
@@ -119,7 +119,7 @@ def check_auth_over_http(http_url: str, timeout: float = 8.0) -> Finding:
                 summary="Auth-like cookies observed; some are missing Secure (risk if ever sent over HTTP).",
                 evidence=evidence,
                 fix="Set Secure on session/auth cookies; ensure cookies are never issued on HTTP endpoints.",
-                refs=["OWASP A02: Identification and Authentication Failures", "OWASP A04: Cryptographic Failures"],
+                refs=["OWASP A07:2025", "OWASP A04:2025"],
             )
 
         # If any cookies were set during HTTP phase (even non-auth-like), warn if final is HTTP
@@ -131,7 +131,7 @@ def check_auth_over_http(http_url: str, timeout: float = 8.0) -> Finding:
                 summary="Cookies were set during an HTTP request; sensitive cookies may be exposed if used for sessions.",
                 evidence=evidence,
                 fix="Force HTTP→HTTPS redirect and set Secure on all session/auth cookies.",
-                refs=["OWASP A02: Identification and Authentication Failures", "OWASP A04: Cryptographic Failures"],
+                refs=["OWASP A07:2025", "OWASP A04:2025"],
             )
 
         # PASS if HTTP immediately redirects to HTTPS and no auth material observed
@@ -142,7 +142,7 @@ def check_auth_over_http(http_url: str, timeout: float = 8.0) -> Finding:
             summary="No authentication material was observed over HTTP (redirects/headers appear safe).",
             evidence=evidence,
             fix="No action required.",
-            refs=["OWASP A02: Identification and Authentication Failures"],
+            refs=["OWASP A07:2025"],
         )
 
     except Exception as e:
@@ -154,6 +154,6 @@ def check_auth_over_http(http_url: str, timeout: float = 8.0) -> Finding:
             summary="Could not verify authentication material exposure over HTTP (request failed).",
             evidence=evidence,
             fix="Verify the host is reachable on HTTP (port 80) and try again.",
-            refs=["OWASP A02: Identification and Authentication Failures"],
+            refs=["OWASP A07:2025"],
         )
 

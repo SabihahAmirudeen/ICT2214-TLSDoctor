@@ -72,7 +72,7 @@ def evaluate_transport_policy(redirect, hsts):
                 summary="HTTP does not redirect to HTTPS",
                 evidence=redirect,
                 fix="Configure the server to redirect all HTTP traffic to HTTPS.",
-                refs="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"
+                refs=["OWASP A02:2025"]
             )
         )
     else:
@@ -84,7 +84,7 @@ def evaluate_transport_policy(redirect, hsts):
                 summary="HTTP redirects to HTTPS",
                 evidence=redirect,
                 fix="No action required.",
-                refs="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"
+                refs=["OWASP A02:2025"]
             )
         )
 
@@ -98,7 +98,7 @@ def evaluate_transport_policy(redirect, hsts):
                 summary="HSTS is not enabled",
                 evidence=hsts,
                 fix="Enable HSTS with max-age more than or equal to 31536000 and includeSubDomains.",
-                refs="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"
+                refs=["OWASP A04:2025", "OWASP HTTP Strict Transport Security Cheat Sheet"]
             )
         )
         return findings  
@@ -111,7 +111,7 @@ def evaluate_transport_policy(redirect, hsts):
                 summary="HSTS is enabled",
                 evidence=hsts,
                 fix="No action required.",
-                refs="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"
+                refs=["OWASP A04:2025", "OWASP HTTP Strict Transport Security Cheat Sheet"]
             )
         )
         
@@ -126,7 +126,8 @@ def evaluate_transport_policy(redirect, hsts):
                 summary="HSTS max-age is less than 1 year",
                 evidence=hsts,
                 fix="Increase HSTS max-age to at least 31536000 seconds.",
-                refs="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"
+                refs=["OWASP A04:2025", "OWASP HTTP Strict Transport Security Cheat Sheet"]
+
             )
         )
    
@@ -140,7 +141,8 @@ def evaluate_transport_policy(redirect, hsts):
                 summary="HSTS includeSubDomains directive is missing",
                 evidence=hsts,
                 fix="Add includeSubDomains to the HSTS policy.",
-                refs="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"
+                refs=["OWASP A04:2025", "OWASP HTTP Strict Transport Security Cheat Sheet"]
+
             )
         )
 
@@ -170,7 +172,7 @@ def evaluate_transport_policy(redirect, hsts):
                         "before using the preload directive. "
                         "Misconfigured preload can permanently break site access."
                     ),
-                    refs="https://hstspreload.org/"
+                    refs=["OWASP A04: 2025", "OWASP HTTP Strict Transport Security Cheat Sheet", "hstspreload.org"]
                 )
             )
         else:
@@ -185,7 +187,7 @@ def evaluate_transport_policy(redirect, hsts):
                         "No action required. Ensure all present and future subdomains "
                         "support HTTPS before remaining on the preload list."
                     ),
-                    refs="https://hstspreload.org/"
+                    refs=["OWASP A04:2025", "OWASP HTTP Strict Transport Security Cheat Sheet", "hstspreload.org"]
                 )
             )
 
