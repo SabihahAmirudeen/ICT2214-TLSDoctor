@@ -123,20 +123,19 @@ def main():
             )
         )
 
-    # Browser Integrity (Static) - Mixed Content
+    # 1) Static mixed content scan
     try:
-        # Static mixed content scan
-        with ProgressSpinner(f"Fetching {target.https_url}", cap=40, step_delay=0.3) as ps:
+        with ProgressSpinner(f"Fetching {target.https_url}", cap=60, step_delay=0.3) as ps:
             html = get_text(target.https_url)
-            ps.update(40)
+            ps.update(60)
 
-        with ProgressSpinner("Scanning for mixed content (static)", cap=70, step_delay=0.2) as ps:
+        with ProgressSpinner("Scanning for mixed content (static)", cap=95, step_delay=0.2) as ps:
             hits = scan_mixed_content(
                 base_url=target.https_url,
                 html=html,
                 http_get_text=get_text,  # enables external CSS scanning
             )
-            ps.update(70)
+            ps.update(95)
 
         for h in hits:
             findings.append(mixed_hit_to_finding(h))
@@ -154,7 +153,22 @@ def main():
                 )
             )
 
-        # Headless mixed content scan
+    except Exception as e:
+        findings.append(
+            Finding(
+                check_id="mixed_content",
+                status=Status.WARN,
+                severity=Severity.MEDIUM,
+                summary="Static mixed content scan failed.",
+                evidence={"error": str(e), "url": target.https_url},
+                fix="Check if the site is reachable over HTTPS and requests is installed.",
+                refs=["OWASP A04:2025"]
+            )
+        )
+
+
+    # 2) Headless mixed content scan
+    try:
         with ProgressSpinner("Scanning for mixed content (headless)", cap=95, step_delay=0.2) as ps:
             headless_hits = scan_headless_mixed_content(target.https_url)
             ps.update(95)
@@ -191,15 +205,16 @@ def main():
     except Exception as e:
         findings.append(
             Finding(
-                check_id="mixed_content",
+                check_id="mixed_content_headless",
                 status=Status.WARN,
                 severity=Severity.MEDIUM,
-                summary="Mixed content scan failed.",
+                summary="Headless mixed content scan failed.",
                 evidence={"error": str(e), "url": target.https_url},
-                fix="Check if the site is reachable over HTTPS and ensure requests / Playwright are installed.",
+                fix="Check if Playwright and Chromium dependencies are installed correctly.",
                 refs=["OWASP A04:2025"]
             )
         )
+
     #Authentication material exposure over HTTP (A02 + A04)
     try:
         findings.append(check_auth_over_http(target.http_url))
