@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 import re
+
 from bs4 import BeautifulSoup  # pip install beautifulsoup4
 
 HTTP_URL_RE = re.compile(r'url\(\s*[\'"]?(http://[^\'")\s]+)[\'"]?\s*\)', re.IGNORECASE)
@@ -14,6 +15,7 @@ ACTIVE_TAG_ATTRS = [
     ("embed", "src"),
     ("link", "href"),  # rel=stylesheet handled by rel check
 ]
+
 PASSIVE_TAG_ATTRS = [
     ("img", "src"),
     ("audio", "src"),
@@ -21,9 +23,11 @@ PASSIVE_TAG_ATTRS = [
     ("source", "src"),
     ("track", "src"),
 ]
+
 SPECIAL_HIGH = [
     ("form", "action"),
 ]
+
 
 @dataclass
 class MixedContentHit:
@@ -35,30 +39,31 @@ class MixedContentHit:
     resource_type: str
     is_active: bool
 
+
 def _is_http(url: str) -> bool:
     try:
         return urlparse(url).scheme.lower() == "http"
     except Exception:
         return False
 
+
 def _classify(tag: str, attr: str, extra: Optional[str] = None) -> Tuple[bool, str]:
-    # Returns (is_active, severity)
     if (tag, attr) in SPECIAL_HIGH:
         return True, "HIGH"
     if (tag, attr) in ACTIVE_TAG_ATTRS:
-        # stylesheet as active-ish
         return True, "HIGH"
     if (tag, attr) in PASSIVE_TAG_ATTRS:
         return False, "MEDIUM"
     return False, "LOW"
 
-def scan_mixed_content(base_url: str, html: str, http_get_text=None) -> List[Finding]:
+
+def scan_mixed_content(base_url: str, html: str, http_get_text=None) -> List[MixedContentHit]:
     """
     base_url: the HTTPS page URL you fetched
     html: HTML content of that page
     http_get_text: optional callable(url)->str for fetching CSS for deeper scanning
     """
-    findings: List[Finding] = []
+    findings: List[MixedContentHit] = []
     soup = BeautifulSoup(html, "html.parser")
 
     # 1) Tag attribute scanning
@@ -68,17 +73,20 @@ def scan_mixed_content(base_url: str, html: str, http_get_text=None) -> List[Fin
             val = el.get(attr)
             if not val:
                 continue
+
             abs_url = urljoin(base_url, val)
             if _is_http(abs_url):
                 is_active, sev = _classify(tag, attr)
+
                 # link rel=stylesheet only
                 if tag == "link":
                     rel = (el.get("rel") or [])
                     rel = [r.lower() for r in rel]
                     if "stylesheet" not in rel:
                         continue
+
                 evidence = f"<{tag} {attr}=\"{val}\">"
-                findings.append(Finding(
+                findings.append(MixedContentHit(
                     check_id="MIXED_CONTENT",
                     title="Mixed content resource over HTTP",
                     severity=sev,
@@ -98,7 +106,7 @@ def scan_mixed_content(base_url: str, html: str, http_get_text=None) -> List[Fin
             http_url = m.group(1)
             abs_url = urljoin(base_url, http_url)
             if _is_http(abs_url):
-                findings.append(Finding(
+                findings.append(MixedContentHit(
                     check_id="MIXED_CONTENT",
                     title="Mixed content URL in inline CSS",
                     severity="MEDIUM",
@@ -108,29 +116,34 @@ def scan_mixed_content(base_url: str, html: str, http_get_text=None) -> List[Fin
                     is_active=False
                 ))
 
-    # 3) External CSS content scanning (optional but recommended)
+    # 3) External CSS content scanning
     if http_get_text:
         for link in soup.find_all("link"):
             rel = (link.get("rel") or [])
             rel = [r.lower() for r in rel]
             if "stylesheet" not in rel:
                 continue
+
             href = link.get("href")
             if not href:
                 continue
+
             css_url = urljoin(base_url, href)
+
             # Only fetch CSS over HTTPS to avoid causing insecure fetches
             if urlparse(css_url).scheme.lower() != "https":
                 continue
+
             try:
                 css_text = http_get_text(css_url) or ""
             except Exception:
                 continue
+
             for m in HTTP_URL_RE.finditer(css_text):
                 http_url = m.group(1)
                 abs_url = urljoin(css_url, http_url)
                 if _is_http(abs_url):
-                    findings.append(Finding(
+                    findings.append(MixedContentHit(
                         check_id="MIXED_CONTENT",
                         title="Mixed content URL in external CSS",
                         severity="MEDIUM",
