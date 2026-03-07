@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 import re
-
 from bs4 import BeautifulSoup  # pip install beautifulsoup4
 
 HTTP_URL_RE = re.compile(r'url\(\s*[\'"]?(http://[^\'")\s]+)[\'"]?\s*\)', re.IGNORECASE)

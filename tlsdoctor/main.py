@@ -18,6 +18,7 @@ from .cert_check import check_certificate
 from .tls_version import check_tls_versions
 from .certificate_strength_check import check_certificate_strength
 from .session_cookie_live import check_session_cookie_lifetime
+from .models import Finding
 
 
 def build_target(input_url: str) -> Target:
