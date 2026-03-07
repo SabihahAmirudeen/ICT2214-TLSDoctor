@@ -75,7 +75,7 @@ def main():
     try:
         with ProgressSpinner(f"Running testssl.sh on {target.host}", cap=95, step_delay=0.8) as ps:
             testssl_json = run_testssl(target.host, testssl_script, out_json)
-            ps.update(60)
+            ps.update(60) 
         findings.extend(parse_testssl_to_findings(testssl_json))
 
         with ProgressSpinner("Analyzing redirect/HSTS", cap=80, step_delay=0.4) as ps:
@@ -275,6 +275,7 @@ def main():
     report = generate_report(target_obj, findings)
 
     # Optionally write report JSON to disk
+    # .
     project_root = Path(__file__).resolve().parents[1]
     report_file = project_root / "tlsdoctor" / "data" / "report.json"
     if args.report:
