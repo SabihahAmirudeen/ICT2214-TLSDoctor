@@ -19,6 +19,7 @@ from .tls_version import check_tls_versions
 from .certificate_strength_check import check_certificate_strength
 from .session_cookie_live import check_session_cookie_lifetime
 from .models import Finding
+from .checks.headless_scan import scan_headless_mixed_content
 
 
 def build_target(input_url: str) -> Target:
@@ -59,6 +60,7 @@ def main():
     parser.add_argument("--json", action="store_true", help="Output JSON only")
     parser.add_argument("--report", action="store_true", help="Write JSON report to tlsdoctor/data/report.json")
     parser.add_argument("--csv", help="Write CSV report to path (e.g. tlsdoctor/data/report.csv)")
+    parser.add_argument("--headless", action="store_true", help="Enable headless mixed content scan")
     args = parser.parse_args()
 
     target = build_target(args.url)
@@ -123,16 +125,19 @@ def main():
 
     # Browser Integrity (Static) - Mixed Content
     try:
-        with ProgressSpinner(f"Fetching {target.https_url}", cap=60, step_delay=0.3) as ps:
+        # Static mixed content scan
+        with ProgressSpinner(f"Fetching {target.https_url}", cap=40, step_delay=0.3) as ps:
             html = get_text(target.https_url)
-            ps.update(60)
-        with ProgressSpinner("Scanning for mixed content", cap=95, step_delay=0.2) as ps:
+            ps.update(40)
+
+        with ProgressSpinner("Scanning for mixed content (static)", cap=70, step_delay=0.2) as ps:
             hits = scan_mixed_content(
                 base_url=target.https_url,
                 html=html,
                 http_get_text=get_text,  # enables external CSS scanning
             )
-            ps.update(95)
+            ps.update(70)
+
         for h in hits:
             findings.append(mixed_hit_to_finding(h))
 
@@ -149,6 +154,40 @@ def main():
                 )
             )
 
+        # Headless mixed content scan
+        with ProgressSpinner("Scanning for mixed content (headless)", cap=95, step_delay=0.2) as ps:
+            headless_hits = scan_headless_mixed_content(target.https_url)
+            ps.update(95)
+
+        for h in headless_hits:
+            findings.append(
+                Finding(
+                    check_id="mixed_content_headless",
+                    status=Status.FAIL,
+                    severity=Severity.HIGH if h.severity == "HIGH" else Severity.MEDIUM,
+                    summary=h.title,
+                    evidence={
+                        "url": h.url,
+                        "evidence": h.evidence,
+                    },
+                    fix="Ensure dynamically loaded resources use HTTPS instead of HTTP.",
+                    refs=["OWASP A04:2025"]
+                )
+            )
+
+        if not headless_hits:
+            findings.append(
+                Finding(
+                    check_id="mixed_content_headless",
+                    status=Status.PASS,
+                    severity=Severity.LOW,
+                    summary="No mixed content detected in headless browser scan.",
+                    evidence={"scanned_url": target.https_url},
+                    fix="No action required.",
+                    refs=["OWASP A04:2025"]
+                )
+            )
+
     except Exception as e:
         findings.append(
             Finding(
@@ -157,7 +196,7 @@ def main():
                 severity=Severity.MEDIUM,
                 summary="Mixed content scan failed.",
                 evidence={"error": str(e), "url": target.https_url},
-                fix="Check if the site is reachable over HTTPS and requests is installed.",
+                fix="Check if the site is reachable over HTTPS and ensure requests / Playwright are installed.",
                 refs=["OWASP A04:2025"]
             )
         )
